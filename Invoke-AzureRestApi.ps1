@@ -1,11 +1,12 @@
 function Invoke-AzureRestApi {
     [CmdletBinding()]
     param(
-        [Parameter(ParameterSetName="BySubscription", Mandatory=$true, Position=1)]$ResourceGroupName,
-        [Parameter(ParameterSetName="BySubscription", Mandatory=$true, Position=2)]$ResourceType,
-        [Parameter(ParameterSetName="BySubscription", Mandatory=$true, Position=3)]$ResourceName,
-        [Parameter(ParameterSetName="BySubscription", Mandatory=$false, Position=4)]$ExtensionResourceName,
-        [Parameter(ParameterSetName="BySubscription", Mandatory=$false, Position=5)]$ExtensionResourceType,
+        [Parameter(ParameterSetName="ByTenant", Mandatory=$true, Position=1)][switch]$TenantLevel,
+        [Parameter(ParameterSetName="BySubscription", Mandatory=$false, Position=1)]$ResourceGroupName,
+        [Parameter(ParameterSetName="ByTenant", Mandatory=$true, Position=2)][Parameter(ParameterSetName="BySubscription", Mandatory=$true, Position=2)]$ResourceType,
+        [Parameter(ParameterSetName="ByTenant", Mandatory=$true, Position=3)][Parameter(ParameterSetName="BySubscription", Mandatory=$true, Position=3)]$ResourceName,
+        [Parameter(ParameterSetName="ByTenant", Mandatory=$true, Position=4)][Parameter(ParameterSetName="BySubscription", Mandatory=$false, Position=4)]$ExtensionResourceType,
+        [Parameter(ParameterSetName="ByTenant", Mandatory=$true, Position=5)][Parameter(ParameterSetName="BySubscription", Mandatory=$false, Position=5)]$ExtensionResourceName,
         [Parameter(ParameterSetName="ByResourceId", Mandatory=$true, Position=1)]$ResourceId,   
         [Parameter(ParameterSetName="FromObject", ValueFromPipeline=$true)]$InputObject,
         $Body = $null,
