@@ -1,4 +1,5 @@
 function Find-AzureRmApiVersion {
+    [CmdletBinding(DefaultParameterSetName="ByResourceProvider")]
     param(
         [Parameter(ParameterSetName="ByResourceProvider", Mandatory=$true, Position=1)]$ProviderNamespace,   
         [Parameter(ParameterSetName="ByResourceProvider", Mandatory=$true, Position=2)]$ResourceType,   
