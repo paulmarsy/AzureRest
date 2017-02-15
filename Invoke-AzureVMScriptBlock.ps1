@@ -8,7 +8,9 @@ function Invoke-AzureVMScriptBlock {
         [switch]$PassThru
     )
 
-    $existingCustomScriptExtension = Invoke-AzureRestApi -ResourceId '/subscriptions/ab25f870-bd70-487d-80d3-76dce74b618d/resourceGroups/AUTOMATIONSTACK77DA/providers/Microsoft.Compute/virtualMachines/test' -Json |
+    $vm = Get-AzureRmVM -ResourceGroupName $ResourceGroupName -Name $VMName -WarningAction Ignore
+
+    $existingCustomScriptExtension = Invoke-AzureRestApi -ResourceId $vm.Id -Json |
         % Resources | ? { $_.type -eq 'Microsoft.Compute/virtualMachines/extensions' -and $_.properties.publisher -eq 'Microsoft.Compute' -and $_.properties.type -eq 'CustomScriptExtension' } |
         % name
     if ($existingCustomScriptExtension) {
@@ -27,7 +29,7 @@ function Invoke-AzureVMScriptBlock {
     Save-AzureRmProfile -Path $azureProfile -Force
     
     $job = Start-Job -Name "CustomScriptExtension-$($ResourceGroupName)-$($VMName)" -ScriptBlock {
-            param($AzureProfile, $SubscriptionId, $ResourceGroupName, $VMName, $FileUri, $FileName, $ExistingCustomScriptExtension)
+            param($AzureProfile, $SubscriptionId, $ResourceGroupName, $Location, $FileUri, $FileName, $ExistingCustomScriptExtension)
             Select-AzureRmProfile -Profile $AzureProfile | Out-Null
             Remove-Item -Path $AzureProfile -Force | Out-Null
             Select-AzureRmSubscription  -SubscriptionId $SubscriptionId | Out-Null
@@ -38,10 +40,8 @@ function Invoke-AzureVMScriptBlock {
             }
 
             $vmExtensionName = 'CustomScriptExtensionme'
-            $vmLocation = Get-AzureRmVM  -ResourceGroupName $ResourceGroupName -Name $VMName -WarningAction Ignore | % Location
-
             Write-Verbose 'Setting CustomScriptExtension...'
-            Set-AzureRmVMCustomScriptExtension -ResourceGroupName $ResourceGroupName -VMName $VMName -Name $vmExtensionName -Location $vmLocation -FileUri $FileUri -Run $FileName -SecureExecution -ForceRerun (Get-Date).Ticks |
+            Set-AzureRmVMCustomScriptExtension -ResourceGroupName $ResourceGroupName -VMName $VMName -Name $vmExtensionName -Location $Location -FileUri $FileUri -Run $FileName -SecureExecution -ForceRerun (Get-Date).Ticks |
                 Format-List |
                 Out-String |
                 Write-Verbose
@@ -55,7 +55,7 @@ function Invoke-AzureVMScriptBlock {
 
             Write-Verbose 'Removing CustomScriptExtension...'
             Remove-AzureRmVMCustomScriptExtension -ResourceGroupName $ResourceGroupName -VMName $VMName -Name $vmExtensionName -Force | Write-Verbose
-    } -ArgumentList @($azureProfile, (Get-AzureRmContext).Subscription.SubscriptionId, $ResourceGroupName, $VMName, $fileUri, $fileName, $existingCustomScriptExtension)
+    } -ArgumentList @($azureProfile, (Get-AzureRmContext).Subscription.SubscriptionId, $ResourceGroupName, $VMName, $vm.Location, $fileUri, $fileName, $existingCustomScriptExtension)
 
     if ($PassThru) { $job }
     else { $job | Receive-Job -AutoRemoveJob -Wait }
