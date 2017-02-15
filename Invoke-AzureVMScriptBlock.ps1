@@ -41,7 +41,7 @@ function Invoke-AzureVMScriptBlock {
 
             $vmExtensionName = 'CustomScriptExtension'
             Write-Verbose 'Setting CustomScriptExtension...'
-            Set-AzureRmVMCustomScriptExtension -ResourceGroupName $ResourceGroupName -Name $vmExtensionName -Location $Location -FileUri $FileUri -Run $FileName -SecureExecution -ForceRerun (Get-Date).Ticks |
+            Set-AzureRmVMCustomScriptExtension -ResourceGroupName $ResourceGroupName -VMName $VMName -Name $vmExtensionName -Location $Location -FileUri $FileUri -Run $FileName -SecureExecution -ForceRerun (Get-Date).Ticks |
                 Format-List |
                 Out-String |
                 Write-Verbose
