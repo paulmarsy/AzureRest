@@ -29,7 +29,7 @@ function Invoke-AzureVMScriptBlock {
     Save-AzureRmProfile -Path $azureProfile -Force
     
     $job = Start-Job -Name "CustomScriptExtension-$($ResourceGroupName)-$($VMName)" -ScriptBlock {
-            param($AzureProfile, $SubscriptionId, $ResourceGroupName, $Location, $FileUri, $FileName, $ExistingCustomScriptExtension)
+            param($AzureProfile, $SubscriptionId, $ResourceGroupName, $VMName, $Location, $FileUri, $FileName, $ExistingCustomScriptExtension)
             Select-AzureRmProfile -Profile $AzureProfile | Out-Null
             Remove-Item -Path $AzureProfile -Force | Out-Null
             Select-AzureRmSubscription  -SubscriptionId $SubscriptionId | Out-Null
@@ -39,9 +39,9 @@ function Invoke-AzureVMScriptBlock {
                 Remove-AzureRmVMCustomScriptExtension -ResourceGroupName $ResourceGroupName -VMName $VMName -Name $ExistingCustomScriptExtension -Force | Write-Verbose
             }
 
-            $vmExtensionName = 'CustomScriptExtensionme'
+            $vmExtensionName = 'CustomScriptExtension'
             Write-Verbose 'Setting CustomScriptExtension...'
-            Set-AzureRmVMCustomScriptExtension -ResourceGroupName $ResourceGroupName -VMName $VMName -Name $vmExtensionName -Location $Location -FileUri $FileUri -Run $FileName -SecureExecution -ForceRerun (Get-Date).Ticks |
+            Set-AzureRmVMCustomScriptExtension -ResourceGroupName $ResourceGroupName -Name $vmExtensionName -Location $Location -FileUri $FileUri -Run $FileName -SecureExecution -ForceRerun (Get-Date).Ticks |
                 Format-List |
                 Out-String |
                 Write-Verbose
