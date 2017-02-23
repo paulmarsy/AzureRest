@@ -16,7 +16,9 @@ function Invoke-AzureVMScriptBlock {
     }
 
     $fileName = 'AzureRestCustomScript.ps1'
-    $fileUri = Upload-AzureTemporaryFile -FileName $fileName -Value $ScriptBlock.ToString()
+    $blob = New-AzureBlob -BlobName $fileName
+    $blob.SetText($ScriptBlock.ToString())
+    $fileUri = $blob.BlobSasUri
     Write-Verbose "FileUri: $fileUri"
     
     $azureProfile = [System.IO.Path]::GetTempFileName()

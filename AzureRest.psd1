@@ -47,7 +47,7 @@ Copyright = '(c) 2017 Paul Marston. All rights reserved.'
 # ProcessorArchitecture = ''
 
 # Modules that must be imported into the global environment prior to importing this module
-RequiredModules = @('AzureRm')
+RequiredModules = @('AzureRm.Profile')
 
 # Assemblies that must be loaded prior to importing this module
 # RequiredAssemblies = @()
@@ -65,7 +65,7 @@ RequiredModules = @('AzureRm')
 # NestedModules = @()
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-FunctionsToExport = @('Find-AzureRmApiVersion','Invoke-AzureRestApi','Invoke-AzureVMScriptBlock')
+FunctionsToExport = @('Find-AzureRmApiVersion','Invoke-AzureRestApi','Invoke-AzureVMScriptBlock','New-AzureBlob')
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = ''
