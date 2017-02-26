@@ -13,7 +13,8 @@ function Invoke-AzureRestApi {
         [Parameter(ParameterSetName="ByResourceId", Position=3)][Parameter(ParameterSetName="ByResource", Position=7)][ValidateNotNullOrEmpty()]$ODataQuery,
         $Body,
         [ValidateSet("GET", "POST", "PUT", "DELETE")]$Method = "GET",
-        [switch]$Json
+        [switch]$Json,
+        [switch]$Raw
     )
 
     if ($null -eq [Microsoft.WindowsAzure.Commands.Common.AzureRmProfileProvider]::Instance.Profile.Context) {
@@ -21,7 +22,6 @@ function Invoke-AzureRestApi {
     }
 
     if ($PSCmdlet.ParameterSetName -ne 'ByUri') {
-        
         if ($PSCmdlet.ParameterSetName -eq 'ByResource') {
             $ResourceId = [Microsoft.Azure.Commands.ResourceManager.Cmdlets.Components.ResourceIdUtility]::GetResourceId(
                 [Microsoft.WindowsAzure.Commands.Common.AzureRmProfileProvider]::Instance.Profile.Context.Subscription.Id,
@@ -51,6 +51,7 @@ function Invoke-AzureRestApi {
         [Microsoft.WindowsAzure.Commands.Common.ApiConstants]::AuthorizationHeaderName = (Get-AzureRmAccessToken).CreateAuthorizationHeader()
         [Microsoft.WindowsAzure.Commands.Common.ApiConstants]::VersionHeaderName = [Microsoft.WindowsAzure.Commands.Common.ApiConstants]::VersionHeaderContentLatest
     }  -Method $Method -Body $Body -UseBasicParsing | % {
+        if ($Raw) { $_.RawContent } 
         if ($Json) { $_.Content | ConvertFrom-Json  }
         else { $_.Content }
     }
