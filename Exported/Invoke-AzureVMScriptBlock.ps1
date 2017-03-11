@@ -24,9 +24,13 @@ function Invoke-AzureVMScriptBlock {
     $azureProfile = [System.IO.Path]::GetTempFileName()
     Save-AzureRmProfile -Path $azureProfile -Force
     
-    $job = Start-Job -Name "ScriptExt-$($ResourceGroupName)-$($VMName)" -ScriptBlock {
+    $job = Start-Job -Name "ScriptExt-$($ResourceGroupName)-$($VMName)" -InitializationScript {
+            Import-Module AzureRM.Profile
+            Import-Module AzureRM.Resources
+            Import-Module AzureRM.Compute   
+    } -ScriptBlock {
             param($ModuleBase, $AzureProfile, $SubscriptionId, $ResourceGroupName, $VMName, $FileUri, $FileName, $Force)
-            Import-Module (Join-Path $ModuleBase 'AzureRest.psd1') -Force
+            Import-Module (Join-Path $ModuleBase 'AzureRest.psd1')
             
             Select-AzureRmProfile -Profile $AzureProfile | Out-Null
             Remove-Item -Path $AzureProfile -Force | Out-Null
